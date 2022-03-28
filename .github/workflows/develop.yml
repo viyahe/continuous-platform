@@ -1,0 +1,54 @@
+name: Edge
+
+on: 
+  push: 
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs: 
+
+  ################## on pull request #################
+
+  linters:
+    name: Run linters
+    steps:
+      - name: pydocstyle
+        run: echo 'Run pydocstyle'
+      - name: gitlint
+        run: echo 'Run gitlint'
+      - name: pylint
+        run: echo 'Run pylint'
+      - name: black
+        run: echo 'Run black'
+
+  tests:
+    name: Run tests
+    steps:
+      - name: pytest
+        run: echo 'Run pytest'
+      - name: coverage
+        run: echo 'Deploy to code climate'
+        # env: 'env variables need for reporting to code climate'
+
+  ############## end of pull request jobs #############
+
+  ################# on push/merged ####################
+
+  build:
+    name: Build
+    if: github.event.push = true
+      steps:
+        - name: Install package dependencies
+          run: echo 'This step will install all dependencies'
+
+  deploy:
+    needs: build
+    if: github.event.push = true
+    name: Deployment
+      steps:
+        - name: Deploy to AWS
+        run: echo 'CDK Deploy'
+        # env: 'env variables need for deploying to AWS'
+
+  ############### end of push/merged jobs ###############
