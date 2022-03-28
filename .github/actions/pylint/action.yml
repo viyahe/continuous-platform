@@ -1,0 +1,4 @@
+name: 'pylint'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

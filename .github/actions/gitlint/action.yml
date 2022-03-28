@@ -1,0 +1,4 @@
+name: 'gitlint'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

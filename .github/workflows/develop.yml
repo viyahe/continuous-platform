@@ -1,4 +1,4 @@
-name: Edge
+name: Deploy to Edge
 
 on: 
   push: 
@@ -11,44 +11,60 @@ jobs:
   ################## on pull request #################
 
   linters:
+    runs-on: ubuntu-18.04
     name: Run linters
     steps:
-      - name: pydocstyle
-        run: echo 'Run pydocstyle'
-      - name: gitlint
-        run: echo 'Run gitlint'
-      - name: pylint
-        run: echo 'Run pylint'
-      - name: black
-        run: echo 'Run black'
+      - uses: actions/checkout@v2
+        name: Check out repository
+      - uses: actions/setup-python@v2
+        name: Setup python
+      # pydocstyle  
+      - run: |
+            pip3 install pydocstyle
+            pydocstyle continuous
+        name: Run pydocstyle
+      # gitlint
+      - uses: ./.github/actions/gitlint
+        name: Trigger gitlint
+      # pylint
+      - uses: ./.github/actions/pylint
+        name: Trigger pylint
+        env:
+          GH_KEY: ${{ secrets.GH_KEY }}
+      # black
+      - uses: ./.github/actions/black
+        name: Trigger black
 
-  tests:
-    name: Run tests
-    steps:
-      - name: pytest
-        run: echo 'Run pytest'
-      - name: coverage
-        run: echo 'Deploy to code climate'
-        # env: 'env variables need for reporting to code climate'
+  # tests:
+  #   runs-on: ubuntu-18.04
+  #   name: Run tests
+  #   steps:
+  #     - name: pytest
+  #       run: echo 'Run pytest'
+  #     - name: coverage
+  #       run: echo 'Deploy to code climate'
+  #       # env: 'env variables need for reporting to code climate'
 
-  ############## end of pull request jobs #############
+  # ############## end of pull request jobs #############
 
-  ################# on push/merged ####################
+  # ################# on push/merged ####################
 
-  build:
-    name: Build
-    if: github.event.push = true
-      steps:
-        - name: Install package dependencies
-          run: echo 'This step will install all dependencies'
+  # build:
+  #   runs-on: ubuntu-18.04
+  #   name: Build
+  #   if: github.event.push = true
+  #   steps:
+  #     - name: Install package dependencies
+  #       run: echo 'This step will install all dependencies'
 
-  deploy:
-    needs: build
-    if: github.event.push = true
-    name: Deployment
-      steps:
-        - name: Deploy to AWS
-        run: echo 'CDK Deploy'
-        # env: 'env variables need for deploying to AWS'
+  # deploy:
+  #   runs-on: ubuntu-18.04
+  #   needs: build
+  #   if: github.event.push = true
+  #   name: Deployment
+  #   steps:
+  #     - name: Deploy to AWS
+  #       run: echo 'CDK Deploy'
+  #     # env: 'env variables need for deploying to AWS'
 
-  ############### end of push/merged jobs ###############
+  # ############### end of push/merged jobs ###############
