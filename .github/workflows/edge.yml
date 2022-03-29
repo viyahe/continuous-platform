@@ -1,0 +1,101 @@
+name: Deploy to Edge
+
+on: 
+  push: 
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs: 
+  linters:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 10
+    name: Linters
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      # Setup python -> 3.8.0
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8.0"
+      # Setup git credentials
+      - name: Setup git credentials
+        uses: de-vri-es/setup-git-credentials@v2
+        with:
+          credentials: ${{ secrets.GIT_CREDENTIALS }}
+      # cache Piplock
+      - id: cache-pipenv
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      # Run linters
+      - name: Run linters
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        uses: ./.github/actions/linters
+  tests:
+    runs-on: ubuntu-18.04
+    needs: linters
+    name: Test and Coverage
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      # Setup python -> 3.8.0
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8.0"
+      # Setup git credentials
+      - name: Setup git credentials
+        uses: de-vri-es/setup-git-credentials@v2
+        with:
+          credentials: ${{ secrets.GIT_CREDENTIALS }}
+      # cache Piplock
+      - id: cache-pipenv
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      # Run tests and coverage
+      - name: Run test and coverage analysis
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        uses: ./.github/actions/tests
+        env:
+          REPORTER_BINARY_URL: ${{ secrets.REPORTER_BINARY_URL }}
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+  # build-deploy:
+  #   runs-on: ubuntu-18.04
+  #   needs: tests
+  #   name: Build & Deploy
+  #   steps:
+  #     - name: Check out repository
+  #       uses: actions/checkout@v2
+  #     # Setup git credentials
+  #     - name: Setup git credentials
+  #       uses: de-vri-es/setup-git-credentials@v2
+  #       with:
+  #         credentials: ${{ secrets.GIT_CREDENTIALS }}
+  #     # Setup python -> 3.8.0
+  #     - name: Setup python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: "3.8.0"
+  #         cache: pipenv
+  #     # Install pipenv
+  #     - name: Install pipenv
+  #       run: pip install pipenv
+  #     # cache Piplock
+  #     - id: cache-pipenv
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ${{ github.path }}
+  #         key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+  #     # Install dependencies
+  #     - name: Install dependencies
+  #       if: steps.cache-pipenv.outputs.cache-hit != 'true'
+  #       run: pipenv install --deploy --dev
+  #     # Test CDK
+  #     - name: Run CDK
+  #       run: cdk ls
+  #     # AWS DEPLOYMENT

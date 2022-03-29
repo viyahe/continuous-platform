@@ -1,0 +1,5 @@
+name: 'Linters'
+description: 'Create virtual env via pipenv then run all linters command'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

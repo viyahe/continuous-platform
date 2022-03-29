@@ -1,4 +1,0 @@
-name: 'black'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'

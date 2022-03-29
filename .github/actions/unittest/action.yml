@@ -1,4 +1,0 @@
-name: 'unittest'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'

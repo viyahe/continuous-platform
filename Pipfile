@@ -1,16 +1,18 @@
 [dev-packages]
 boto3 = "*"
 black = "==20.8b1"  # pre-releases are not found by default
+gitlint = "*"
 pylint = "*"
+pydocstyle = "*"
 pytest = "*"
 pytest-cov = "*"
-viyahe-graphql = {git = "ssh://git@github.com/viyahe/appsync.git", ref = "develop"}
+viyahe-graphql = {git = "https://github.com/viyahe/appsync.git", ref = "develop"}
 aws-cdk_aws-lambda-event-sources = "==1.110.1"
 aws-cdk_assertions = "==1.110.1"
 
 [packages]
 python-dotenv = "*"
-viyahe-platform-common = {git = "ssh://git@github.com/viyahe/python-common.git", ref = "develop", subdirectory = "platform_common"}
+viyahe-platform-common = {git = "https://github.com/viyahe/python-common.git", ref = "develop", subdirectory = "platform_common"}
 
 [requires]
 python_version = "3.8"
@@ -19,6 +21,8 @@ python_version = "3.8"
 allow_prereleases = true
 
 [scripts]
+black = "black . --check --config=.black"
+gitlint = "gitlint -vvv -d lint"
 pylint = "pylint dummy"
 pydocstyle = "pydocstyle dummy"
 pytest = "pytest --cov=dummy --cov-report xml --cov-report term-missing -p no:warnings"
