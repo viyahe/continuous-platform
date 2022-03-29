@@ -1,5 +1,0 @@
-name: 'Test and Coverage'
-description: 'Create virtual env via pipenv then runs pytest and coverage analysis'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
