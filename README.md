@@ -27,10 +27,10 @@ Make use of pipenv to run all linters and tests to optimize workflow run time. S
 - **Workflow Triggers**
   - **Edge and Staging environments**
     - On github.event: pull_request
-      - `Only on pull request to branches: [develop, staging] - Linters, Test and Coverage will be triggered`
+      - `Only on pull request to branches: [develop, staging, acceptance] - Linters, Test and Coverage will be triggered`
 
     - On github.event: push
-      - `Only on push/merge to branches: [develop, staging] - Build and Deploy will be triggered`
+      - `Only on push/merge to branches: [develop, staging, acceptance] - Build and Deploy will be triggered`
       
   - **Production environments**
     - On github.event: pull_request
