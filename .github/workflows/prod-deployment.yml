@@ -1,12 +1,6 @@
-name: Release
+name: Release to Prod
 
-# ENV VARIABLES ARE STILL FOR EDGE - TO UPDATE
-# APPLY MANUAL TRIGGER - TO DO
-on: 
-  push: 
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [workflow_dispatch]
 
 jobs: 
   linters:
@@ -98,8 +92,8 @@ jobs:
   build-deploy:
     runs-on: ubuntu-18.04
     needs: [ linters, tests ]
-    if: github.event.pull_request.merged == true && github.ref == 'refs/heads/main'
-    name: Build & Deploy
+    if: github.event.pull_request.merged == true
+    name: Build and Deploy
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -142,9 +136,8 @@ jobs:
       # Deploy
       - name: Deploy to AWS
         run: |
-          pipenv run cdk deploy --all -c deployment_name=${{ secrets.DEPLOYMENT_NAME }}
+          pipenv run cdk deploy --all -c deployment_name=${{ secrets.PROD_DEPLOYMENT_NAME }}
         env:
-          AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
+          AWS_REGION: ${{ secrets.PROD_AWS_DEFAULT_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
