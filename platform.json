@@ -1,0 +1,13 @@
+{
+  "name": "dummy",
+  "version": "1.0.0",
+  "handlers": [
+    "createDummy"
+  ],
+  "lambda": {
+    "default": {
+      "memory_size": 128,
+      "timeout": 6
+    }
+  }
+}
