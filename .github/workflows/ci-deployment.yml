@@ -5,7 +5,6 @@ on:
     branches: [develop, feature-test, staging, acceptance, releases/**]
   pull_request:
     branches: [develop, feature-test, staging, acceptance, releases/**]
-    types: [closed, opened]
 
 jobs: 
   linters:
