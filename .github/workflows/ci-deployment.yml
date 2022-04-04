@@ -1,4 +1,4 @@
-name: CI/CD pipeline
+name: CI/CD Pgipeline
 
 on: 
   push: 
@@ -96,7 +96,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-18.04
     needs: [ linters, tests ]
-    if: github.event.pull_request.merged == true
+    if: ${{ github.event_name == 'push' }}
     name: Build and Deploy
     steps:
       - name: Check out repository
@@ -111,7 +111,7 @@ jobs:
       - name: Setup ssh key for git
         run: |
           mkdir -p /home/runner/.ssh
-          ssh-keyscan -t rsa github.com > /home/runner/.ssh//known_hosts
+          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
           echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
           chmod 400 /home/runner/.ssh/id_rsa
         env:
@@ -146,8 +146,8 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
       # Configure AWS creds for feature-testing - this is still on Edge for test purposes
-      - name: Configure AWS creds for feature-testing
-        if: github.ref == 'refs/heads/feature-testing'
+      - name: Configure AWS creds for feature-test
+        if: github.ref == 'refs/heads/feature-test'
         run: |
           echo "DEPLOYMENT_NAME=''" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.EDGE_AWS_DEFAULT_REGION  }}" >> $GITHUB_ENV
