@@ -107,7 +107,7 @@ jobs:
       - name: Setup ssh key for git
         run: |
           mkdir -p /home/runner/.ssh
-          ssh-keyscan -t rsa github.com > /home/runner/.ssh//known_hosts
+          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
           echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
           chmod 400 /home/runner/.ssh/id_rsa
         env:
