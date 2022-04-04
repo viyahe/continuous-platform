@@ -146,8 +146,8 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
       # Configure AWS creds for feature-testing - this is still on Edge for test purposes
-      - name: Configure AWS creds for feature-testing
-        if: github.ref == 'refs/heads/feature-testing'
+      - name: Configure AWS creds for feature-test
+        if: github.ref == 'refs/heads/feature-test'
         run: |
           echo "DEPLOYMENT_NAME=''" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.EDGE_AWS_DEFAULT_REGION  }}" >> $GITHUB_ENV
