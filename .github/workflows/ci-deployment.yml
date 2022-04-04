@@ -96,7 +96,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-18.04
     needs: [ linters, tests ]
-    if: github.event.pull_request.merged == true
+    if: ${{ github.event.pull_request.merged == true }}
     name: Build and Deploy
     steps:
       - name: Check out repository
