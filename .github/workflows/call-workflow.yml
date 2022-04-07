@@ -1,0 +1,23 @@
+name: Call Workflow
+
+on: 
+  push: 
+    branches: [feature-test]
+  pull_request:
+    branches: [feature-test]
+
+jobs:
+  checks:
+    runs-on: ubuntu-18.04
+    name: Checks
+    steps:
+      - run: echo 'This is the first job'
+  call-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml
+    secrets:
+      DEPLOYMENT_NAME: ''
+      AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: $ {{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: $ {{ secrets.EDGE_AWS_DEFAULT_REGION }}
