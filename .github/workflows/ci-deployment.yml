@@ -141,7 +141,7 @@ jobs:
       - name: Configure AWS creds for Edge
         if: github.ref == 'refs/heads/develop'
         run: |
-          echo "DEPLOYMENT_NAME=${{ secrets.EDGE_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+          echo "DEPLOYMENT_NAME=${{ secrets.EDGE_DEPLOYMENT_NAME }}" >> $GITHUB_ENV
           echo "AWS_REGION=${{ secrets.EDGE_AWS_DEFAULT_REGION  }}" >> $GITHUB_ENV
           echo "AWS_ACCESS_KEY_ID=${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
