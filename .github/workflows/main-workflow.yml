@@ -64,7 +64,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.ACCEPTANCE_AWS_SECRET_ACCESS_KEY }}
   prod-deployment:
     needs: [linters, test]
-    if: ${{ github.event.inputs.deployment == 'PROD' }} #put password into secret
+    if: ${{ github.event.inputs.deployment == 'PROD' && github.ref == 'refs/heads/main' }} #put password into secret
     uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
