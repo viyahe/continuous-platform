@@ -21,7 +21,7 @@ jobs:
   feature-test-deployment:
     needs: checks
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' }}
-    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ''
@@ -31,7 +31,7 @@ jobs:
   edge-deployment:
     needs: checks
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
-    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.EDGE_DEPLOYMENT_NAME }}
@@ -41,7 +41,7 @@ jobs:
   staging-deployment:
     needs: checks
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/staging' }}
-    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.STAGING_DEPLOYMENT_NAME }}
@@ -51,7 +51,7 @@ jobs:
   acceptance-test-deployment:
     needs: checks
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/acceptance' }}
-    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.ACCEPTANCE_DEPLOYMENT_NAME }}
@@ -61,7 +61,7 @@ jobs:
   prod-test-deployment:
     needs: checks
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' || github.event.inputs.environment == 'PROD' }}
-    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.PROD_DEPLOYMENT_NAME }}
