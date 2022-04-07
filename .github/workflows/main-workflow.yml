@@ -2,7 +2,7 @@ name: CI/CD Workflow
 
 on: 
   push: 
-    branches: [feature-test]
+    branches: [develop]
   pull_request:
     branches: [feature-test]
   workflow_dispatch:
@@ -13,15 +13,19 @@ on:
         required: true
 
 jobs:
-  checks:
-    runs-on: ubuntu-18.04
-    name: Checks
-    steps:
-      - run: echo 'This is the first job'
+  linters:
+    uses: ./github/workflows/linters-workflow.yml
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+  test:
+    uses: /github/workflows/test-workflow.yml
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
   feature-test-deployment:
-    needs: checks
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' }}
-    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
+    needs: [linters, test]
+    if: ${{ github.event_name == 'push' }}
+    uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ''
@@ -29,9 +33,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
   edge-deployment:
-    needs: checks
+    needs: [linters, test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
-    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
+    uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.EDGE_DEPLOYMENT_NAME }}
@@ -39,9 +43,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
   staging-deployment:
-    needs: checks
+    needs: [linters, test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/staging' }}
-    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
+    uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.STAGING_DEPLOYMENT_NAME }}
@@ -49,9 +53,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_AWS_SECRET_ACCESS_KEY }}
   acceptance-test-deployment:
-    needs: checks
+    needs: [linters, test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/acceptance' }}
-    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
+    uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.ACCEPTANCE_DEPLOYMENT_NAME }}
@@ -59,9 +63,9 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.ACCEPTANCE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.ACCEPTANCE_AWS_SECRET_ACCESS_KEY }}
   prod-test-deployment:
-    needs: checks
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' || github.event.inputs.environment == 'PROD' }}
-    uses: viyahe/continuous-platform/.github/workflows/deployment-workflow.yml@feature-test
+    needs: [linters, test]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event.inputs.deployment == 'PROD' }} #put password into secret
+    uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ${{ secrets.PROD_DEPLOYMENT_NAME }}
