@@ -1,7 +1,9 @@
 [dev-packages]
 boto3 = "*"
 black = "==20.8b1"  # pre-releases are not found by default
+gitlint = "*"
 pylint = "*"
+pydocstyle = "*"
 pytest = "*"
 pytest-cov = "*"
 viyahe-graphql = {git = "ssh://git@github.com/viyahe/appsync.git", ref = "develop"}
@@ -19,6 +21,8 @@ python_version = "3.8"
 allow_prereleases = true
 
 [scripts]
+black = "black . --check --config=.black"
+gitlint = "gitlint -vvv -d lint"
 pylint = "pylint dummy"
 pydocstyle = "pydocstyle dummy"
 pytest = "pytest --cov=dummy --cov-report xml --cov-report term-missing -p no:warnings"
