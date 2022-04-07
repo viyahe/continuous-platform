@@ -2,9 +2,9 @@ name: CI/CD Workflow
 
 on: 
   push: 
-    branches: [develop]
+    branches: [feature-test, develop, staging, acceptance, release/**]
   pull_request:
-    branches: [feature-test]
+    branches: [feature-test, develop, staging, acceptance, release/**]
   workflow_dispatch:
     inputs:
       deployment:
@@ -24,7 +24,7 @@ jobs:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
   feature-test-deployment:
     needs: [linters, test]
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' }}
     uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
@@ -52,7 +52,7 @@ jobs:
       AWS_REGION: ${{ secrets.STAGING_AWS_DEFAULT_REGION }}
       AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_AWS_SECRET_ACCESS_KEY }}
-  acceptance-test-deployment:
+  acceptance-deployment:
     needs: [linters, test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/acceptance' }}
     uses: ./.github/workflows/deployment-workflow.yml
@@ -62,9 +62,9 @@ jobs:
       AWS_REGION: ${{ secrets.ACCEPTANCE_AWS_DEFAULT_REGION }}
       AWS_ACCESS_KEY_ID: ${{ secrets.ACCEPTANCE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.ACCEPTANCE_AWS_SECRET_ACCESS_KEY }}
-  prod-test-deployment:
+  prod-deployment:
     needs: [linters, test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event.inputs.deployment == 'PROD' }} #put password into secret
+    if: ${{ github.event.inputs.deployment == 'PROD' }} #put password into secret
     uses: ./.github/workflows/deployment-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
