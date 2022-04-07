@@ -3,6 +3,8 @@ name: Deployment Workflow
 on: 
   workflow_call:
     secrets:
+      SSH_KEY:
+        required: true
       DEPLOYMENT_NAME:
         required: true
       AWS_ACCESS_KEY_ID:

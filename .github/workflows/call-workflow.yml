@@ -17,6 +17,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
     secrets:
+      SSH_KEY: ${{ secrets.SSH }}
       DEPLOYMENT_NAME: ''
       AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: $ {{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
