@@ -1,0 +1,70 @@
+name: CI/CD Workflow
+
+on: 
+  push: 
+    branches: [feature-test]
+  pull_request:
+    branches: [feature-test]
+  workflow_dispatch:
+    inputs:
+      deployment:
+        description: 'Release Manager Password'
+        type: String
+        required: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-18.04
+    name: Checks
+    steps:
+      - run: echo 'This is the first job'
+  feature-test-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      DEPLOYMENT_NAME: ''
+      AWS_REGION: ${{ secrets.EDGE_AWS_DEFAULT_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
+  edge-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      DEPLOYMENT_NAME: ${{ secrets.EDGE_DEPLOYMENT_NAME }}
+      AWS_REGION: ${{ secrets.EDGE_AWS_DEFAULT_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.EDGE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.EDGE_AWS_SECRET_ACCESS_KEY }}
+  staging-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/staging' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      DEPLOYMENT_NAME: ${{ secrets.STAGING_DEPLOYMENT_NAME }}
+      AWS_REGION: ${{ secrets.STAGING_AWS_DEFAULT_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_AWS_SECRET_ACCESS_KEY }}
+  acceptance-test-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/acceptance' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      DEPLOYMENT_NAME: ${{ secrets.ACCEPTANCE_DEPLOYMENT_NAME }}
+      AWS_REGION: ${{ secrets.ACCEPTANCE_AWS_DEFAULT_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.ACCEPTANCE_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.ACCEPTANCE_AWS_SECRET_ACCESS_KEY }}
+  prod-test-deployment:
+    needs: checks
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature-test' || github.event.inputs.environment == 'PROD' }}
+    uses: viyahe/continuous-platform/.github/workflows/reusable-deployment.yml@feature-test
+    secrets:
+      SSH_KEY: ${{ secrets.SSH }}
+      DEPLOYMENT_NAME: ${{ secrets.PROD_DEPLOYMENT_NAME }}
+      AWS_REGION: ${{ secrets.PROD_AWS_DEFAULT_REGION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
