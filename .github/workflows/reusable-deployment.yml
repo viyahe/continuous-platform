@@ -35,7 +35,7 @@ jobs:
           echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
           chmod 400 /home/runner/.ssh/id_rsa
         env:
-          SSH_KEY: ${{ secrets.SSH }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
       # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v2
