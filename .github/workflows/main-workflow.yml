@@ -14,11 +14,11 @@ on:
 
 jobs:
   linters:
-    uses: ./github/workflows/linters-workflow.yml
+    uses: ./.github/workflows/linters-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
   test:
-    uses: /github/workflows/test-workflow.yml
+    uses: ./.github/workflows/test-workflow.yml
     secrets:
       SSH_KEY: ${{ secrets.SSH }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
