@@ -1,4 +1,7 @@
 # CI/CD Implementation Tests and Documentation Repo
+
+### Software Development Cycle
+- [Software Development Documentation](https://docs.google.com/document/d/1vbmhxodqEOuSb-so2PWHQrD098zXapY3rJraD5UeKio/edit)
 ### Pre-requisites 
 
 - [Environment Variables](https://docs.google.com/spreadsheets/d/1sWs-Nfzx3ReiiCzKCe7OY5GnQrAiVt_PCasFb9frzpY/edit#gid=1807969178)
@@ -27,10 +30,10 @@ Make use of pipenv to run all linters and tests to optimize workflow run time. S
 - **Workflow Triggers**
   - **Edge and Staging environments**
     - On github.event: pull_request
-      - `Only on pull request to branches: [develop, staging, acceptance] - Linters, Test and Coverage will be triggered`
+      - `Only on pull request to branches: [feature-test, develop, staging, acceptance] - Linters, Test and Coverage will be triggered`
 
     - On github.event: push
-      - `Only on push/merge to branches: [develop, staging, acceptance] - Build and Deploy will be triggered`
+      - `Only on push/merge to branches: [feature-test, develop, staging, acceptance] - Build and Deploy will be triggered`
       
   - **Production environments**
     - On github.event: pull_request
@@ -39,9 +42,11 @@ Make use of pipenv to run all linters and tests to optimize workflow run time. S
     - On github.event: push
       - `Only on push/merge to branches: [main] - Manual trigger of Build and Deploy`
 
-_Note: almost several steps are duplicated due to a fresh runner being required for starting each job. For example, the setup of python and ssh key from Linters cannot be used in Test and Coverage because it will instantiate a new OS (Ubuntu 18.04)._
+_Note: reusable workflows are on main branch (default). See [linters-workflow.yml](https://github.com/viyahe/continuous-platform/blob/main/.github/workflows/linters-workflow.yml), [test-workflow.yml](https://github.com/viyahe/continuous-platform/blob/main/.github/workflows/test-workflow.yml) and [deployment-workflow.yml](https://github.com/viyahe/continuous-platform/blob/main/.github/workflows/deployment-workflow.yml) for reference. 
 
-_Check [ci-deployment.yml](#) for reference._
+Reference: [Reusing worklows](https://docs.github.com/en/actions/using-workflows/reusing-workflows)
+
+_Check [main-workflow.yml](https://github.com/viyahe/continuous-platform/blob/main/.github/workflows/main-workflow.yml) for usage._
 
 - **Linters**
   - Build from runner (Github OS runner: Ubuntu 18.04)
