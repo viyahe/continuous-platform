@@ -1,0 +1,56 @@
+# This is a reusable workflow - check main-workflow for the integration
+name: Test Workflow
+
+on:
+  workflow_call:
+    secrets: 
+      SSH_KEY:
+        required: true
+      CC_TEST_REPORTER_ID:
+        required: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 10
+    name: Test and Coverage
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      # Setup python -> 3.8.0
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8.0"
+          cache: pipenv
+      # Setup git credentials
+      - name: Setup ssh key for git
+        run: |
+          mkdir -p /home/runner/.ssh
+          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
+          echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
+          chmod 400 /home/runner/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+      # Install pipenv
+      - name: Install pipenv
+        run: pip install pipenv
+      # cache Piplock
+      - id: cache-pipenv
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      # Install dependencies
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install --deploy --dev
+      # Run pytest
+      - name: Run pytest
+        run: pipenv run pytest
+      # Publish code coverage
+      - name: Publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          debug: true

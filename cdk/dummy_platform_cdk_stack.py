@@ -22,8 +22,11 @@ class DummyDynamoDbCdkStack(BaseDynamoDbCdkStack):
             stream=StreamViewType.NEW_AND_OLD_IMAGES,
         )
 
+
 class DummyPlatformCdkStack(PlatformCdkStack):
-    def __init__(self, scope: core.Construct, dynamodb_stack: DummyDynamoDbCdkStack, **kwargs) -> None:
+    def __init__(
+        self, scope: core.Construct, dynamodb_stack: DummyDynamoDbCdkStack, **kwargs
+    ) -> None:
         super().__init__(scope, dynamodb_stack=dynamodb_stack, **kwargs)
 
         ddb_stream_event_source = DynamoEventSource(

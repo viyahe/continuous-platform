@@ -28,7 +28,4 @@ Resources:
           KeyType: HASH
         - AttributeName: sort_key
           KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: !Ref 'ReadCapacityUnits'
-        WriteCapacityUnits: !Ref 'WriteCapacityUnits'
       TableName: 'dummyTable'

@@ -1,0 +1,52 @@
+# This is a reusable workflow - check main-workflow for the integration
+name: Linters Workflow
+
+on:
+  workflow_call:
+    secrets: 
+      SSH_KEY:
+        required: true
+
+jobs:
+  linters:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 10
+    name: Linters
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      # Setup python -> 3.8.0
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8.0"
+          cache: pipenv
+      # Setup git credentials
+      - name: Setup ssh key for git
+        run: |
+          mkdir -p /home/runner/.ssh
+          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
+          echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
+          chmod 400 /home/runner/.ssh/id_rsa
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+      # Install pipenv
+      - name: Install pipenv
+        run: pip install pipenv
+      # cache Piplock
+      - id: cache-pipenv
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.path }}
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      # Install dependencies
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install --deploy --dev
+      # Run linters
+      - name: Run linters
+        run: |
+          pipenv run black
+          pipenv run gitlint
+          pipenv run pylint
+          pipenv run pydocstyle
