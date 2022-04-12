@@ -1,7 +1,7 @@
 # CI/CD Implementation Tests and Documentation Repo
 
 ### Software Development Cycle
-- [Software Development Documentation]()
+- [Software Development Documentation](https://docs.google.com/document/d/1vbmhxodqEOuSb-so2PWHQrD098zXapY3rJraD5UeKio/edit)
 ### Pre-requisites 
 
 - [Environment Variables](https://docs.google.com/spreadsheets/d/1sWs-Nfzx3ReiiCzKCe7OY5GnQrAiVt_PCasFb9frzpY/edit#gid=1807969178)
