@@ -3,7 +3,18 @@ name: Linters Workflow
 
 on:
   workflow_call:
-    secrets: 
+    inputs:
+      has-node:
+        description: does repo has node
+        default: false
+        type: boolean
+        required: false
+      has-python:
+        description: does repo has python
+        default: false
+        type: boolean
+        required: false
+    secrets:
       SSH_KEY:
         required: true
 
@@ -15,38 +26,23 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      # Setup python -> 3.8.0
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8.0"
-          cache: pipenv
-      # Setup git credentials
-      - name: Setup ssh key for git
-        run: |
-          mkdir -p /home/runner/.ssh
-          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
-          echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
-          chmod 400 /home/runner/.ssh/id_rsa
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-      # Install pipenv
-      - name: Install pipenv
-        run: pip install pipenv
-      # cache Piplock
-      - id: cache-pipenv
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.path }}
-          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
-      # Install dependencies
-      - name: Install dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: pipenv install --deploy --dev
-      # Run linters
+
+      - name: Install Dependencies (pipfile)
+        if: inputs.has-python
+        uses: viyahe/actions/pipenv-install@v1
+
+      - name: Install Dependencies (npm)
+        if: inputs.has-node
+        uses: viyahe/actions/npm-install@v1
+
       - name: Run linters
+        if: inputs.has-python
         run: |
           pipenv run black
           pipenv run gitlint
           pipenv run pylint
           pipenv run pydocstyle
+
+      - name: Run Eslint
+        if: inputs.has-node
+        run: yarn lint

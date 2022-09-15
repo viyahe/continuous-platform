@@ -9,7 +9,7 @@ on:
     inputs:
       deployment:
         description: 'Release Manager Password'
-        type: String
+        type: string
         required: true
 
 jobs:

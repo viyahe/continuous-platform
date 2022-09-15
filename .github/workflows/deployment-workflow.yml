@@ -3,6 +3,17 @@ name: Deployment Workflow
 
 on: 
   workflow_call:
+    inputs:
+      has-node:  
+        description: does repo has node
+        default: false
+        type: boolean
+        required: false
+      has-python:
+        description: does repo has python 
+        default: false
+        type: boolean
+        required: false
     secrets:
       SSH_KEY:
         required: true
@@ -17,57 +28,40 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: Build and Deploy
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
-      # Setup python -> 3.8.0
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8.0"
-          cache: pipenv
-      # Setup git credentials
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk 
+
       - name: Setup ssh key for git
-        run: |
-          mkdir -p /home/runner/.ssh
-          ssh-keyscan -t rsa github.com > /home/runner/.ssh/known_hosts
-          echo "$SSH_KEY" > /home/runner/.ssh/id_rsa
-          chmod 400 /home/runner/.ssh/id_rsa
+        uses: viyahe/actions/setup-ssh-key@v1
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
-      # Setup Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      # Install AWS CDK
-      - name: Install AWS CDK
-        run: npm install -g aws-cdk
-      # Install pipenv
-      - name: Install pipenv
-        run: pip install pipenv
-      # cache Piplock
-      - id: cache-pipenv
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}
-          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
-      # Install dependencies
-      - name: Install dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: pipenv install --deploy --dev
-      # Check AWS Creds
+
+      - name: Install Dependencies (pipfile)
+        if: inputs.has-python
+        uses: viyahe/actions/pipenv-install@v1
+
+      - name: Install Dependencies (npm)
+        if: inputs.has-node
+        uses: viyahe/actions/npm-install@v1
+
       - name: Print AWS Creds
         run: |
           echo ${{ secrets.AWS_REGION }}
           echo ${{ secrets.AWS_ACCESS_KEY_ID }}
           echo ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # Deploy
+
       - name: Deploy to AWS
         run: |
-          pipenv run cdk deploy --all -c deployment_name=${{ secrets.DEPLOYMENT_NAME }}
+          cdk deploy --all -c deployment_name=${{ secrets.DEPLOYMENT_NAME }}
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
